@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+apply plugin: 'kotlin-android'
+
+ext {
+    koinVersion= "2.2.2"
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.unfinished.simplemvi.example"
+        minSdk 23
+        targetSdk 31
+        versionCode 1
+        versionName "1.0"
+
+        manifestPlaceholders["buildVersion"] = "${versionCode}"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+
+    implementation project(':simplemvi')
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation "androidx.fragment:fragment-ktx:1.4.1"
+    implementation "org.koin:koin-core:$koinVersion"
+    implementation "org.koin:koin-android-ext:$koinVersion"
+    implementation 'net.dean.jraw:JRAW-Android:1.1.0'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+}

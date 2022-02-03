@@ -1,0 +1,162 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'maven-publish'
+    id 'signing'
+    id("org.jetbrains.dokka") version "1.6.10"
+}
+
+apply plugin: 'kotlin-android'
+
+group = 'com.unfinished.simplemvi'
+version = '1.0.0'
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        minSdk 16
+        targetSdk 31
+        versionCode 1
+        versionName version
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+        unitTests.all {
+            testLogging {
+                showStackTraces = true
+                exceptionFormat = 'full'
+            }
+        }
+        unitTests.returnDefaultValues = true
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.5.1'
+    testImplementation 'org.assertj:assertj-core:3.22.0'
+    testImplementation 'io.mockk:mockk:1.12.2'
+    testImplementation "androidx.fragment:fragment-ktx:1.4.1"
+    debugImplementation "androidx.fragment:fragment-testing:1.4.1"
+}
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+        from android.sourceSets.main.kotlin.srcDirs
+    } else {
+        from sourceSets.main.java.srcDirs
+        from sourceSets.main.kotlin.srcDirs
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    classifier "javadoc"
+    from dokkaHtml.outputDirectory
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives javadocJar
+}
+
+signing {
+    def signingKey = System.getenv("SIGNING_KEY")
+    def signingPassword = System.getenv("SIGNING_PASSWORD")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                customizePom(pom)
+                groupId 'com.unfinished.simplemvi'
+                artifactId 'simplemvi'
+                version version
+
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact androidSourcesJar
+                artifact javadocJar
+            }
+        }
+    }
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'Supports Model-View-Intent Architecture Pattern'
+            name 'Simple MVI'
+            url 'https://github.com/LibertyDSNP/simple-mvi'
+            organization {
+                name 'com.unfinished'
+                url 'https://unfinished.com'
+            }
+            issueManagement {
+                system 'GitHub'
+                url 'https://github.com/LibertyDSNP/simple-mvi/issues'
+            }
+            licenses {
+                license {
+                    name 'Apache License 2.0'
+                    url 'https://github.com/LibertyDSNP/simple-mvi/blob/master/LICENSE'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url 'https://github.com/LibertyDSNP/simple-mvi'
+                connection 'scm:git:git://github.com/LibertyDSNP/simple-mvi.git'
+                developerConnection 'scm:git:ssh://git@github.com:/LibertyDSNP/simple-mvi.git'
+            }
+            developers {
+                developer {
+                    name 'Unfinished Labs LLC'
+                }
+            }
+        }
+    }
+}

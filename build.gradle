@@ -1,0 +1,32 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.0.4"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0"
+    }
+}
+
+plugins {
+    id("io.github.gradle-nexus.publish-plugin") version("1.1.0")
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID")
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = System.getenv("SONATYPE_USERNAME")
+            password = System.getenv("SONATYPE_PASSWORD")
+        }
+    }
+    repositoryDescription = "Simple MVI"
+}

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SimpleMVI</string>
+    <string name="login">Login</string>
+    <string name="comments">Comments:</string>
+    <string name="search_term">Search Term</string>
+    <string name="home">Home</string>
+    <string name="post">Post</string>
+</resources>
