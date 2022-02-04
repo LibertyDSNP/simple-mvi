@@ -75,7 +75,7 @@ class HomeScreenPresenter: Presenter<HomeScreenState, HomeScreenAction>() {
     override fun startingState() = HomeScreenState()
 
     // conducts a state reduction: Takes the action and the last state, to create the new state
-    override fun reduce(lastState: HomeScreenState, action: HomeScreenAction) {
+    override fun reduce(lastState: HomeScreenState, action: HomeScreenAction) : HomeScreenState {
         return when (action) {
             is HomeScreenStateAction.DataLoaded -> lastState.copy(
                 loading = false,
@@ -206,7 +206,7 @@ class HomeScreenPresenter: Presenter<HomeScreenState, HomeScreenAction>() {
     }
 
     // conducts a state reduction: Takes the action and the last state, to create the new state
-    override fun reduce(lastState: HomeScreenState, action: HomeScreenAction) {
+    override fun reduce(lastState: HomeScreenState, action: HomeScreenAction) : HomeScreenState {
         return when (action) {
             is HomeScreenStateAction.DataLoaded -> lastState.copy(
                 loading = false,
